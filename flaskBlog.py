@@ -1,5 +1,16 @@
 from flask import Flask, render_template
+from flask_sqlalchemy import SQLAlchemy
+
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+class Post(db.Model):
+   userId = db.Column(db.Integer)
+   id = db.Column(db.Integer, primary_key=True)
+   title = db.Column(db.String(100))
+   body = db.Column(db.String(200))
 
 posts =[
 {
@@ -23,5 +34,8 @@ def home_window():
 def about_app():
    return render_template('about.html')
 
+
 if __name__ == '__main__':
+   with app.app_context():
+      db.create_all()
    app.run(debug=True)
