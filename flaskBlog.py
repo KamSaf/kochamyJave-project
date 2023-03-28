@@ -1,5 +1,6 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
@@ -30,9 +31,17 @@ posts =[
 def home_window():
    return render_template('home.html', posts = posts)
 
+#dodać @app.route
+def add():
+   new_post = Post(userId = 1, id = 1, title = 'placeholder title', body = 'placeholder text')
+   with app.app_context():
+      db.session.add(new_post)
+      db.session.commit()
+   return redirect(url_for("home"))
 @app.route('/about')
 def about_app():
    return render_template('about.html')
+
 
 
 if __name__ == '__main__':
