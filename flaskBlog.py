@@ -27,6 +27,7 @@ posts =[
    'post_date': '28/03/2023'
 }
 ]
+
 @app.route('/')
 def home_window():
    return render_template('home.html', posts = posts)
@@ -38,6 +39,7 @@ def add():
       db.session.add(new_post)
       db.session.commit()
    return redirect(url_for("home"))
+
 @app.route('/about')
 def about_app():
    return render_template('about.html')
