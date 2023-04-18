@@ -15,6 +15,10 @@ class MyTestCase(unittest.TestCase):
         rv = self.app.get('/about')
         self.assertIn(b'About', rv.data)
 
+    def test_new_post_page(self):
+        rv = self.app.get('/new_post')
+        self.assertIn(b'Opublikuj', rv.data)
+
 
 if __name__ == '__main__':
     unittest.main()
