@@ -27,6 +27,7 @@ class Post(db.Model):
 #    'post_date': '28/03/2023'
 # }
 # ]
+
 @app.route('/')
 def home_window():
    posts = Post.query.all()
@@ -52,6 +53,7 @@ def delete(id):
 @app.route("/new_post")
 def new_post():
    return render_template('new_post.html')
+
 @app.route('/about')
 def about_app():
    return render_template('about.html')

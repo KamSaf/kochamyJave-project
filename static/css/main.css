@@ -1,0 +1,115 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #444;
+}
+
+header {
+  background: linear-gradient(-45deg, #017635, #00731C, #008004, #1E8C00, #489900);
+  background-size: 400% 400%;
+  animation: anim 10s ease infinite;
+  height: 50px;
+  width: 100%;
+  opacity: .9;
+  margin-bottom: 10px;
+  padding: 5px;
+}
+background. {
+  background: linear-gradient(90deg, #F200FA, #AC0DFD);
+  background-size: 400% 400%;
+  animation: anim 5s infinite ease-in-uot;
+}
+@keyframes anim {
+      0% {
+          background-position: 0 50%;
+      }
+      50% {
+          background-position: 100% 50%;
+      }
+      100%{
+          background-position: 0 50%;
+      }
+  }
+
+header h1.logo {
+  margin-top: 5px;
+  font-size: 2em;
+  color: #fff;
+  text-transform: uppercase;
+  float: left;
+}
+
+header h1.logo:hover {
+  color: #fff;
+  text-decoration: none;
+}
+img {
+  border-radius: 20%;
+  float: left;
+}
+.container {
+  width: 1350px;
+  margin: 0 auto;
+}
+.container1 {
+  display: flex;
+  align-items: center;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 5px;
+  width: 1150px;
+  text-align: right;
+  margin: right;
+  padding-left: 50px;
+}
+.container2 {
+  padding-top: 25px;
+  display: grid ;
+  align-items: center;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 5px;
+  width: 500px;
+  padding-left: 50px;
+}
+div.home {
+  padding: 10px 0 30px 0;
+  background-color: #E6E6FA;
+  -webkit-border-radius: 6px;
+     -moz-border-radius: 6px;
+          border-radius: 6px;
+}
+div.about {
+  padding: 10px 0 30px 0;
+  background-color: #E6E6FA;
+  -webkit-border-radius: 6px;
+     -moz-border-radius: 6px;
+          border-radius: 6px;
+}
+h2 {
+  font-size: 1.8em;
+  margin-top: 40px;
+  text-align: center;
+  letter-spacing: -2px;
+}
+h3 {
+  font-size: 1.5em;
+  font-weight: 100;
+  margin-top: 30px;
+  text-align: left;
+  letter-spacing: -1px;
+  color: #000;
+}
+.menu {
+  float: right;
+  margin-top: 15px;
+}
+.menu li {
+  display: inline;
+}
+.menu li + li {
+  margin-left: 35px;
+}
+.menu li a {
+  color: #fff;
+  text-decoration: none;
+}
