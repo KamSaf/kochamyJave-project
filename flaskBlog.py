@@ -13,32 +13,46 @@ class Post(db.Model):
    title = db.Column(db.String(100))
    body = db.Column(db.String(200))
 
-posts =[
-{
-   'author': 'pablo escobar',
-   'title': "first post",
-   'content': 'i love italian cars',
-   'post_date': '27/03/2023'
-},
-{
-   'author': 'george clooney',
-   'title': "second post",
-   'content': 'i love fixing pablo\'s cars',
-   'post_date': '28/03/2023'
-}
-]
+# posts =[
+# {
+#    'author': 'pablo escobar',
+#    'title': "first post",
+#    'content': 'i love italian cars',
+#    'post_date': '27/03/2023'
+# },
+# {
+#    'author': 'george clooney',
+#    'title': "second post",
+#    'content': 'i love fixing pablo\'s cars',
+#    'post_date': '28/03/2023'
+# }
+# ]
 
 @app.route('/')
 def home_window():
+   posts = Post.query.all()
    return render_template('home.html', posts = posts)
 
-#dodać @app.route
+@app.route("/add", methods=["POST"]) #Dodawanie postu do bazy
 def add():
-   new_post = Post(userId = 1, id = 1, title = 'placeholder title', body = 'placeholder text')
+   new_post = Post(userId = request.form.get("user_id"), title = request.form.get("title"), body = request.form.get("body"))
    with app.app_context():
       db.session.add(new_post)
       db.session.commit()
-   return redirect(url_for("home"))
+   return redirect(url_for("home_window"))
+
+@app.route("/delete/<int:id>")
+def delete(id):
+    #delete existing post
+    with app.app_context():
+        post = Post.query.filter_by(id=id).first()
+        db.session.delete(post)
+        db.session.commit()
+    return redirect(url_for("home_window"))
+
+@app.route("/new_post")
+def new_post():
+   return render_template('new_post.html')
 
 @app.route('/about')
 def about_app():

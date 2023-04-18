@@ -26,7 +26,11 @@
             <h1>{{post.title}}</h1>
             <p>By {{post.author}} on {{post.post_date}}</p>
             <p> {{ post.content }}</p>
+                 <form action="/delete/{{post.id}}" method="post">
+                <a href="/delete/{{post.id}}">Usuń post</a>
+         </form>
             {% endfor %}
+            <h4><a href="/new_post"> Dodaj post </a></h4>
           </ul>
         </nav></strong>
       </div>
