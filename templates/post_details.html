@@ -31,7 +31,7 @@
             <p>By {{post.userId}} on {{post.post_date}}</p>
             <h2> {{ post.body }}</h2>
                  <form action="/delete/{{post.id}}" method="post">
-                <a href="/delete/{{post.id}}">Usuń post</a>
+                <a href="/delete/{{post.id}}">Delete post</a>
          </form>
             {% endfor %}
           </ul>
