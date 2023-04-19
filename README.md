@@ -4,6 +4,15 @@ to add and comment posts. For educational purposes the application uses free RES
 
 # How to run
 1. Clone project from GitHub.
-2. Create new virtual environment and activate it.
-3. Install Flask and SQLAlchemy packages.
-4. Run the flaskBlog.py file with Python.
+ 
+3. Create new virtual environment and activate it.
+
+5. Required packages:
+  - Flask, 
+  - Flask-SQLAlchemy,
+  - Flask-Testing,
+  - pytest,
+  - requests,
+  - SQLAlchemy
+
+5. Run the flaskBlog.py file with Python.
