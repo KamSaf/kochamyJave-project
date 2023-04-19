@@ -58,6 +58,15 @@ def new_post():
 def about_app():
    return render_template('about.html')
 
+@app.route('/login_page')
+def login_page():
+   return render_template('login_page.html')
+
+@app.route('/post_details')
+def post_details():
+    posts = Post.query.filter_by()
+    return render_template('post_details.html', posts=posts)
+
 
 
 if __name__ == '__main__':
