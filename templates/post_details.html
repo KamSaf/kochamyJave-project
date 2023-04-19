@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>kochamyJave-Project</title>
+    {%  for post in posts %}
+      <title>{{post.title}}</title>
+    {% endfor %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
   </head>
   <body>
     <header>
       <div class="container">
-        <h1 class="logo">Home page</h1>
+        {%  for post in posts %}
+            <h1 class="logo">{{post.title}}</h1>
+        {% endfor %}
         <strong><nav>
           <ul class="menu">
-            <li><a href="/about">About</a></li>
+            <li><a href="/">Home</a></li>
               <li><a href="/login_page">Log In</a> </li>
           </ul>
         </nav></strong>
@@ -24,13 +28,12 @@
         <strong><nav>
           <ul class="menu">
             {%  for post in posts %}
-            <a href="/post_details" style="color: black; text-decoration: none"><h1>{{post.title}}</h1></a>
             <p>By {{post.userId}} on {{post.post_date}}</p>
+            <h2> {{ post.body }}</h2>
                  <form action="/delete/{{post.id}}" method="post">
-                <a href="/delete/{{post.id}}" style="text-decoration: none">Delete post</a>
+                <a href="/delete/{{post.id}}">Delete post</a>
          </form>
             {% endfor %}
-            <h4><a href="/new_post" style="text-decoration: none"> Add post </a></h4>
           </ul>
         </nav></strong>
       </div>

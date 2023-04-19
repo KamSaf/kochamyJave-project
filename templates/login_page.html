@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Logowanie</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <header>
+          <div class="container">
+              <strong><nav>
+          <ul class="menu">
+            <li><a href="/">Home</a></li>
+          </ul>
+        </nav></strong>
+          </div>
+    </header>
+      <div align="center" style="margin-top: 50px;">
+        <b><h1> Logowanie</h1></b><br>
+          <form action="" method="login">
+              <div>
+                <input type="text" size="50" name="username" placeholder="Nazwa użytkownika"> <br>
+                <input type="password" name="password" placeholder="Hasło"> <br>
+                <button type="submit">Zaloguj</button> <br>
+              </div>
+          </form>
+      </div>
+</body>
+</html>
