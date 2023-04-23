@@ -23,7 +23,7 @@
   <div class="container1">
         <strong><nav>
           <ul class="menu">
-            <p>By {{post.userId}} on {{post.post_date}}</p>
+            <p>By {{user.login}} on {{post.post_date}}</p>
             <h2> {{ post.body }}</h2>
                  <form action="/delete/{{post.id}}" method="post">
                 <a href="/delete/{{post.id}}">Delete post</a>
