@@ -9,12 +9,18 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
-# creating SQLAlchemy database model
-class Post(db.Model):
+# creating SQLAlchemy database models
+class Post(db.Model): # posts database
     userId = db.Column(db.Integer)
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100))
     body = db.Column(db.String(200))
+
+
+class Users(db.Model): # users database
+    id = db.Column(db.Integer, primary_key=True)
+    login = db.Column(db.String(100))
+    password = db.Column(db.String(200)) # temporarily password is stored without using a hashing function
 
 
 # getting data from JSONPlaceholder API
@@ -23,7 +29,7 @@ data = api_response.text
 json_posts = json.loads(data)
 
 
-@app.route('/')
+@app.route('/') # Rendering all posts in database
 def home_window():
     posts = Post.query.all()
     return render_template('home.html', posts=posts)
@@ -57,12 +63,12 @@ def about_app():
     return render_template('about.html')
 
 
-@app.route('/login_page')
+@app.route('/login_page') # url to login page
 def login_page():
    return render_template('login_page.html')
 
 
-@app.route('/post_details/<int:id>')
+@app.route('/post_details/<int:id>') # url to details of a post
 def post_details(id):
     #posts = Post.query.filter_by()
     with app.app_context():
