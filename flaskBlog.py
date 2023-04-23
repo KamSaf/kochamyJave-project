@@ -62,10 +62,12 @@ def login_page():
    return render_template('login_page.html')
 
 
-@app.route('/post_details')
-def post_details():
-    posts = Post.query.filter_by()
-    return render_template('post_details.html', posts=posts)
+@app.route('/post_details/<int:id>')
+def post_details(id):
+    #posts = Post.query.filter_by()
+    with app.app_context():
+        post = Post.query.filter_by(id=id).first()
+    return render_template('post_details.html', post=post)
 
 
 if __name__ == '__main__':

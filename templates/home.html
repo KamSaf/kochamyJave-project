@@ -24,7 +24,7 @@
         <strong><nav>
           <ul class="menu">
             {%  for post in posts %}
-            <a href="/post_details" style="color: black; text-decoration: none"><h1>{{post.title}}</h1></a>
+            <a href="/post_details/{{post.id}}" style="color: black; text-decoration: none"><h1>{{post.title}}</h1></a>
             <p>By {{post.userId}} on {{post.post_date}}</p>
                  <form action="/delete/{{post.id}}" method="post">
                 <a href="/delete/{{post.id}}" style="text-decoration: none">Delete post</a>
