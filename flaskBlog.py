@@ -117,6 +117,12 @@ def search_post():
         users = Users.query.all()
     return render_template('home.html', posts=posts, users=users)
 
+@app.route("/filtered", methods=["POST"])  # Filtering posts by author
+def filtered_post():
+    with app.app_context():
+        posts = Post.query.filter(Post.userId == (request.form.get("filtered_string"))).all()
+        users = Users.query.all()
+    return render_template('home.html', posts=posts, users=users)
 
 @app.route('/about')  # url to the about page
 def about_app():
