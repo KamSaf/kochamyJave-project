@@ -23,55 +23,55 @@ class Users(db.Model):  # users database
     password = db.Column(db.String(200), unique=True)  # temporarily password is stored without using a hashing function
 
 
-new_user = Users(login="Kamil", password="kamil")
-with app.app_context():
-    db.session.add(new_user)
-    db.session.commit()
-
-new_user = Users(login="Slawek", password="slawek")
-with app.app_context():
-    db.session.add(new_user)
-    db.session.commit()
-
-new_user = Users(login="Marcin", password="marcin")
-with app.app_context():
-    db.session.add(new_user)
-    db.session.commit()
-
-new_user = Users(login="Ola", password="ola")
-with app.app_context():
-    db.session.add(new_user)
-    db.session.commit()
-
-new_user = Users(login="Marek", password="marek")
-with app.app_context():
-    db.session.add(new_user)
-    db.session.commit()
-
-new_user = Users(login="Patryk", password="patryk")
-with app.app_context():
-    db.session.add(new_user)
-    db.session.commit()
-
-new_user = Users(login="Pawel", password="pawel")
-with app.app_context():
-    db.session.add(new_user)
-    db.session.commit()
-
-new_user = Users(login="mateusz", password="mateusz")
-with app.app_context():
-    db.session.add(new_user)
-    db.session.commit()
-
-new_user = Users(login="Laura", password="laura")
-with app.app_context():
-    db.session.add(new_user)
-    db.session.commit()
-
-new_user = Users(login="Patrycja", password="patrycja")
-with app.app_context():
-    db.session.add(new_user)
-    db.session.commit()
+# new_user = Users(login="Kamil", password="kamil")
+# with app.app_context():
+#     db.session.add(new_user)
+#     db.session.commit()
+#
+# new_user = Users(login="Slawek", password="slawek")
+# with app.app_context():
+#     db.session.add(new_user)
+#     db.session.commit()
+#
+# new_user = Users(login="Marcin", password="marcin")
+# with app.app_context():
+#     db.session.add(new_user)
+#     db.session.commit()
+#
+# new_user = Users(login="Ola", password="ola")
+# with app.app_context():
+#     db.session.add(new_user)
+#     db.session.commit()
+#
+# new_user = Users(login="Marek", password="marek")
+# with app.app_context():
+#     db.session.add(new_user)
+#     db.session.commit()
+#
+# new_user = Users(login="Patryk", password="patryk")
+# with app.app_context():
+#     db.session.add(new_user)
+#     db.session.commit()
+#
+# new_user = Users(login="Pawel", password="pawel")
+# with app.app_context():
+#     db.session.add(new_user)
+#     db.session.commit()
+#
+# new_user = Users(login="mateusz", password="mateusz")
+# with app.app_context():
+#     db.session.add(new_user)
+#     db.session.commit()
+#
+# new_user = Users(login="Laura", password="laura")
+# with app.app_context():
+#     db.session.add(new_user)
+#     db.session.commit()
+#
+# new_user = Users(login="Patrycja", password="patrycja")
+# with app.app_context():
+#     db.session.add(new_user)
+#     db.session.commit()
 
 
 # getting data from JSONPlaceholder API
