@@ -74,7 +74,6 @@ class Users(db.Model):  # users database
 #     db.session.commit()
 
 
-
 # getting data from JSONPlaceholder API
 api_response = requests.get('https://jsonplaceholder.typicode.com/posts')
 data = api_response.text
@@ -115,7 +114,8 @@ def new_post():
 def search_post():
     with app.app_context():
         posts = Post.query.filter(Post.title.contains(request.form.get("searched_string"))).all()
-    return render_template('home.html', posts=posts)
+        users = Users.query.all()
+    return render_template('home.html', posts=posts, users=users)
 
 
 @app.route('/about')  # url to the about page
@@ -133,7 +133,7 @@ def check_login_data():
     with app.app_context():
         entered_login = request.form.get("username")
         entered_password = request.form.get("password")
-        if Users.query.filter_by(login=entered_login) is None:
+        if Users.query.filter_by(login=entered_login) is None or entered_login == '' or entered_password == '':
             return render_template('login_page.html')
         elif Users.query.filter_by(login=entered_login).first().password == entered_password:
             return redirect(url_for("home_window"))
