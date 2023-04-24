@@ -9,12 +9,70 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
-# creating SQLAlchemy database model
-class Post(db.Model):
+# creating SQLAlchemy database models
+class Post(db.Model):  # posts database
     userId = db.Column(db.Integer)
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100))
     body = db.Column(db.String(200))
+
+
+class Users(db.Model):  # users database
+    id = db.Column(db.Integer, primary_key=True)
+    login = db.Column(db.String(100), unique=True)
+    password = db.Column(db.String(200), unique=True)  # temporarily password is stored without using a hashing function
+
+
+# new_user = Users(login="Kamil", password="kamil")
+# with app.app_context():
+#     db.session.add(new_user)
+#     db.session.commit()
+#
+# new_user = Users(login="Slawek", password="slawek")
+# with app.app_context():
+#     db.session.add(new_user)
+#     db.session.commit()
+#
+# new_user = Users(login="Marcin", password="marcin")
+# with app.app_context():
+#     db.session.add(new_user)
+#     db.session.commit()
+#
+# new_user = Users(login="Ola", password="ola")
+# with app.app_context():
+#     db.session.add(new_user)
+#     db.session.commit()
+#
+# new_user = Users(login="Marek", password="marek")
+# with app.app_context():
+#     db.session.add(new_user)
+#     db.session.commit()
+#
+# new_user = Users(login="Patryk", password="patryk")
+# with app.app_context():
+#     db.session.add(new_user)
+#     db.session.commit()
+#
+# new_user = Users(login="Pawel", password="pawel")
+# with app.app_context():
+#     db.session.add(new_user)
+#     db.session.commit()
+#
+# new_user = Users(login="mateusz", password="mateusz")
+# with app.app_context():
+#     db.session.add(new_user)
+#     db.session.commit()
+#
+# new_user = Users(login="Laura", password="laura")
+# with app.app_context():
+#     db.session.add(new_user)
+#     db.session.commit()
+#
+# new_user = Users(login="Patrycja", password="patrycja")
+# with app.app_context():
+#     db.session.add(new_user)
+#     db.session.commit()
+
 
 
 # getting data from JSONPlaceholder API
@@ -23,10 +81,11 @@ data = api_response.text
 json_posts = json.loads(data)
 
 
-@app.route('/')
+@app.route('/')  # Rendering all posts in database
 def home_window():
     posts = Post.query.all()
-    return render_template('home.html', posts=posts)
+    users = Users.query.all()
+    return render_template('home.html', posts=posts, users=users)
 
 
 @app.route("/add", methods=["POST"])  # Adding post to the database
@@ -38,7 +97,7 @@ def add():
     return redirect(url_for("home_window"))
 
 
-@app.route("/delete/<int:id>") # Deleting post from database
+@app.route("/delete/<int:id>")  # Deleting post from database
 def delete(id):
     with app.app_context():
         post = Post.query.filter_by(id=id).first()
@@ -47,25 +106,47 @@ def delete(id):
     return redirect(url_for("home_window"))
 
 
-@app.route("/new_post") # url to the new post page
+@app.route("/new_post")  # url to the new post page
 def new_post():
     return render_template('new_post.html')
 
 
-@app.route('/about') # url to the about page
+@app.route("/search", methods=["POST"])  # Searching posts by substring in post title
+def search_post():
+    with app.app_context():
+        posts = Post.query.filter(Post.title.contains(request.form.get("searched_string"))).all()
+    return render_template('home.html', posts=posts)
+
+
+@app.route('/about')  # url to the about page
 def about_app():
     return render_template('about.html')
 
 
-@app.route('/login_page')
+@app.route('/login_page')  # url to login page
 def login_page():
-   return render_template('login_page.html')
+    return render_template('login_page.html')
 
 
-@app.route('/post_details')
-def post_details():
-    posts = Post.query.filter_by()
-    return render_template('post_details.html', posts=posts)
+@app.route('/login', methods=["POST"])  # method checking if entered data is valid
+def check_login_data():
+    with app.app_context():
+        entered_login = request.form.get("username")
+        entered_password = request.form.get("password")
+        if Users.query.filter_by(login=entered_login) is None:
+            return render_template('login_page.html')
+        elif Users.query.filter_by(login=entered_login).first().password == entered_password:
+            return redirect(url_for("home_window"))
+        else:
+            return render_template('login_page.html')
+
+
+@app.route('/post_details/<int:id>')  # url to details of a post
+def post_details(id):
+    with app.app_context():
+        post = Post.query.filter_by(id=id).first()
+        user = Users.query.filter_by(id=post.userId).first()
+    return render_template('post_details.html', post=post, user=user)
 
 
 if __name__ == '__main__':
@@ -78,4 +159,4 @@ if __name__ == '__main__':
                     db.session.add(new_post)
                     db.session.commit()
                     posts_added = True
-    app.run() # when debug=True for some reason the for loop above adds posts twice
+    app.run()  # when debug=True for some reason the for loop above adds posts twice

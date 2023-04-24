@@ -1,17 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {%  for post in posts %}
       <title>{{post.title}}</title>
-    {% endfor %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
   </head>
   <body>
     <header>
       <div class="container">
-        {%  for post in posts %}
             <h1 class="logo">{{post.title}}</h1>
-        {% endfor %}
         <strong><nav>
           <ul class="menu">
             <li><a href="/">Home</a></li>
@@ -27,13 +23,11 @@
   <div class="container1">
         <strong><nav>
           <ul class="menu">
-            {%  for post in posts %}
-            <p>By {{post.userId}} on {{post.post_date}}</p>
+            <p>By {{user.login}} on {{post.post_date}}</p>
             <h2> {{ post.body }}</h2>
                  <form action="/delete/{{post.id}}" method="post">
                 <a href="/delete/{{post.id}}">Delete post</a>
          </form>
-            {% endfor %}
           </ul>
         </nav></strong>
       </div>

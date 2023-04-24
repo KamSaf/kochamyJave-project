@@ -23,14 +23,20 @@
   <div class="container1">
         <strong><nav>
           <ul class="menu">
+              <form action="/search" method="post">
+              <div>
+                <input type="text" size="50" name="searched_string" placeholder="Title"> <br>
+                <button type="submit">Search</button> <br>
+              </div>
+          </form>
+              <h4><a href="/new_post" style="text-decoration: none"> Add post </a></h4> <br><br>
             {%  for post in posts %}
-            <a href="/post_details" style="color: black; text-decoration: none"><h1>{{post.title}}</h1></a>
-            <p>By {{post.userId}} on {{post.post_date}}</p>
+            <a href="/post_details/{{post.id}}" style="color: black; text-decoration: none"><h1>{{post.title}}</h1></a>
+            <p>By {{users[post.userId-1].login}} on {{post.post_date}}</p>
                  <form action="/delete/{{post.id}}" method="post">
                 <a href="/delete/{{post.id}}" style="text-decoration: none">Delete post</a>
          </form>
             {% endfor %}
-            <h4><a href="/new_post" style="text-decoration: none"> Add post </a></h4>
           </ul>
         </nav></strong>
       </div>
