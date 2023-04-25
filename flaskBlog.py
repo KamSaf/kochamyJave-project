@@ -23,6 +23,7 @@ class Users(db.Model):  # users database
     password = db.Column(db.String(200), unique=True)  # temporarily password is stored without using a hashing function
 
 
+
 # new_user = Users(login="Kamil", password="kamil")
 # with app.app_context():
 #     db.session.add(new_user)
@@ -112,17 +113,23 @@ def new_post():
 
 @app.route("/search", methods=["POST"])  # Searching posts by substring in post title
 def search_post():
+    if request.form.get("filtered_string") == '':
+        return redirect(url_for("home_window"))
     with app.app_context():
         posts = Post.query.filter(Post.title.contains(request.form.get("searched_string"))).all()
         users = Users.query.all()
     return render_template('home.html', posts=posts, users=users)
 
+
 @app.route("/filtered", methods=["POST"])  # Filtering posts by author
 def filtered_post():
+    if request.form.get("filtered_string") == '':
+        return redirect(url_for("home_window"))
     with app.app_context():
         posts = Post.query.filter(Post.userId == (request.form.get("filtered_string"))).all()
         users = Users.query.all()
     return render_template('home.html', posts=posts, users=users)
+
 
 @app.route('/about')  # url to the about page
 def about_app():
