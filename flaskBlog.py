@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, make_response
 from flask_sqlalchemy import SQLAlchemy
 import json
 import requests
@@ -6,6 +6,10 @@ import requests
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_BINDS'] = {
+    'test_database': 'sqlite:///test.db',
+    'production_database': 'sqlite:///db.sqlite'
+}
 db = SQLAlchemy(app)
 
 
@@ -23,56 +27,60 @@ class Users(db.Model):  # users database
     password = db.Column(db.String(200), unique=True)  # temporarily password is stored without using a hashing function
 
 
+# with app.app_context():
+#     print(Users.query.first().login)
+with app.app_context():
+    db.create_all()
+    if Users.query.first() is None:
+        new_user = Users(login="Kamil", password="kamil")
+        with app.app_context():
+            db.session.add(new_user)
+            db.session.commit()
 
-# new_user = Users(login="Kamil", password="kamil")
-# with app.app_context():
-#     db.session.add(new_user)
-#     db.session.commit()
-#
-# new_user = Users(login="Slawek", password="slawek")
-# with app.app_context():
-#     db.session.add(new_user)
-#     db.session.commit()
-#
-# new_user = Users(login="Marcin", password="marcin")
-# with app.app_context():
-#     db.session.add(new_user)
-#     db.session.commit()
-#
-# new_user = Users(login="Ola", password="ola")
-# with app.app_context():
-#     db.session.add(new_user)
-#     db.session.commit()
-#
-# new_user = Users(login="Marek", password="marek")
-# with app.app_context():
-#     db.session.add(new_user)
-#     db.session.commit()
-#
-# new_user = Users(login="Patryk", password="patryk")
-# with app.app_context():
-#     db.session.add(new_user)
-#     db.session.commit()
-#
-# new_user = Users(login="Pawel", password="pawel")
-# with app.app_context():
-#     db.session.add(new_user)
-#     db.session.commit()
-#
-# new_user = Users(login="mateusz", password="mateusz")
-# with app.app_context():
-#     db.session.add(new_user)
-#     db.session.commit()
-#
-# new_user = Users(login="Laura", password="laura")
-# with app.app_context():
-#     db.session.add(new_user)
-#     db.session.commit()
-#
-# new_user = Users(login="Patrycja", password="patrycja")
-# with app.app_context():
-#     db.session.add(new_user)
-#     db.session.commit()
+        new_user = Users(login="Slawek", password="slawek")
+        with app.app_context():
+            db.session.add(new_user)
+            db.session.commit()
+
+        new_user = Users(login="Marcin", password="marcin")
+        with app.app_context():
+            db.session.add(new_user)
+            db.session.commit()
+
+        new_user = Users(login="Ola", password="ola")
+        with app.app_context():
+            db.session.add(new_user)
+            db.session.commit()
+
+        new_user = Users(login="Marek", password="marek")
+        with app.app_context():
+            db.session.add(new_user)
+            db.session.commit()
+
+        new_user = Users(login="Patryk", password="patryk")
+        with app.app_context():
+            db.session.add(new_user)
+            db.session.commit()
+
+        new_user = Users(login="Pawel", password="pawel")
+        with app.app_context():
+            db.session.add(new_user)
+            db.session.commit()
+
+        new_user = Users(login="mateusz", password="mateusz")
+        with app.app_context():
+            db.session.add(new_user)
+            db.session.commit()
+
+        new_user = Users(login="Laura", password="laura")
+        with app.app_context():
+            db.session.add(new_user)
+            db.session.commit()
+
+        new_user = Users(login="Patrycja", password="patrycja")
+        with app.app_context():
+            db.session.add(new_user)
+            db.session.commit()
 
 
 # getting data from JSONPlaceholder API
@@ -80,16 +88,21 @@ api_response = requests.get('https://jsonplaceholder.typicode.com/posts')
 data = api_response.text
 json_posts = json.loads(data)
 
-
 @app.route('/')  # Rendering all posts in database
 def home_window():
+    logged_user = request.cookies.get('username')
     posts = Post.query.all()
     users = Users.query.all()
-    return render_template('home.html', posts=posts, users=users)
+    #return render_template('home.html')
+    if logged_user is None:
+        return render_template('home.html', posts=posts, users=users)
+    else:
+        return render_template('home.html', posts=posts, users=users, logged_user=logged_user)
 
 
 @app.route("/add", methods=["POST"])  # Adding post to the database
 def add():
+    logged_user = request.cookies.get('username')
     new_post = Post(userId=request.form.get("user_id"), title=request.form.get("title"), body=request.form.get("body"))
     with app.app_context():
         db.session.add(new_post)
@@ -99,6 +112,7 @@ def add():
 
 @app.route("/delete/<int:id>")  # Deleting post from database
 def delete(id):
+    logged_user = request.cookies.get('username')
     with app.app_context():
         post = Post.query.filter_by(id=id).first()
         db.session.delete(post)
@@ -108,12 +122,14 @@ def delete(id):
 
 @app.route("/new_post")  # url to the new post page
 def new_post():
+    logged_user = request.cookies.get('username')
     return render_template('new_post.html')
 
 
 @app.route("/search", methods=["POST"])  # Searching posts by substring in post title
 def search_post():
-    if request.form.get("filtered_string") == '':
+    logged_user = request.cookies.get('username')
+    if request.form.get("searched_string") == '':
         return redirect(url_for("home_window"))
     with app.app_context():
         posts = Post.query.filter(Post.title.contains(request.form.get("searched_string"))).all()
@@ -123,6 +139,7 @@ def search_post():
 
 @app.route("/filtered", methods=["POST"])  # Filtering posts by author
 def filtered_post():
+    logged_user = request.cookies.get('username')
     if request.form.get("filtered_string") == '':
         return redirect(url_for("home_window"))
     with app.app_context():
@@ -146,16 +163,20 @@ def check_login_data():
     with app.app_context():
         entered_login = request.form.get("username")
         entered_password = request.form.get("password")
-        if Users.query.filter_by(login=entered_login) is None or entered_login == '' or entered_password == '':
+        if Users.query.filter_by(login=entered_login).first() is None or entered_login == '' or entered_password == '':
             return render_template('login_page.html')
-        elif Users.query.filter_by(login=entered_login).first().password == entered_password:
-            return redirect(url_for("home_window"))
+        elif Users.query.filter_by(login=entered_login).first() is not None \
+                and Users.query.filter_by(login=entered_login).first().password == entered_password:
+            resp = make_response(redirect(url_for("home_window")))
+            resp.set_cookie('username', entered_login)
+            return resp
         else:
             return render_template('login_page.html')
 
 
 @app.route('/post_details/<int:id>')  # url to details of a post
 def post_details(id):
+    logged_user = request.cookies.get('username')
     with app.app_context():
         post = Post.query.filter_by(id=id).first()
         user = Users.query.filter_by(id=post.userId).first()
