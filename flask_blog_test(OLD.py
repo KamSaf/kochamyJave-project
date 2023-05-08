@@ -1,5 +1,5 @@
 import flask_testing
-from flaskBlog import app, db, Users
+from flask_blog import app, db, Users
 
 
 class TestPages(flask_testing.TestCase):
