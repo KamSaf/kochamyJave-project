@@ -1,6 +1,7 @@
 import flask_testing
 from flask_blog import app, db, Users
 
+
 class TestLogin(flask_testing.TestCase):
 
     def create_app(self):

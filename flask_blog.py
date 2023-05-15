@@ -29,58 +29,59 @@ class Users(db.Model):  # users database
 
 # with app.app_context():
 #     print(Users.query.first().login)
-with app.app_context():
-    db.create_all()
-    if Users.query.first() is None:
-        new_user = Users(login="Kamil", password="kamil")
-        with app.app_context():
-            db.session.add(new_user)
-            db.session.commit()
+def create_users_database():
+    with app.app_context():
+        db.create_all()
+        if Users.query.first() is None:
+            new_user = Users(login="Kamil", password="kamil")
+            with app.app_context():
+                db.session.add(new_user)
+                db.session.commit()
 
-        new_user = Users(login="Slawek", password="slawek")
-        with app.app_context():
-            db.session.add(new_user)
-            db.session.commit()
+            new_user = Users(login="Slawek", password="slawek")
+            with app.app_context():
+                db.session.add(new_user)
+                db.session.commit()
 
-        new_user = Users(login="Marcin", password="marcin")
-        with app.app_context():
-            db.session.add(new_user)
-            db.session.commit()
+            new_user = Users(login="Marcin", password="marcin")
+            with app.app_context():
+                db.session.add(new_user)
+                db.session.commit()
 
-        new_user = Users(login="Ola", password="ola")
-        with app.app_context():
-            db.session.add(new_user)
-            db.session.commit()
+            new_user = Users(login="Ola", password="ola")
+            with app.app_context():
+                db.session.add(new_user)
+                db.session.commit()
 
-        new_user = Users(login="Marek", password="marek")
-        with app.app_context():
-            db.session.add(new_user)
-            db.session.commit()
+            new_user = Users(login="Marek", password="marek")
+            with app.app_context():
+                db.session.add(new_user)
+                db.session.commit()
 
-        new_user = Users(login="Patryk", password="patryk")
-        with app.app_context():
-            db.session.add(new_user)
-            db.session.commit()
+            new_user = Users(login="Patryk", password="patryk")
+            with app.app_context():
+                db.session.add(new_user)
+                db.session.commit()
 
-        new_user = Users(login="Pawel", password="pawel")
-        with app.app_context():
-            db.session.add(new_user)
-            db.session.commit()
+            new_user = Users(login="Pawel", password="pawel")
+            with app.app_context():
+                db.session.add(new_user)
+                db.session.commit()
 
-        new_user = Users(login="mateusz", password="mateusz")
-        with app.app_context():
-            db.session.add(new_user)
-            db.session.commit()
+            new_user = Users(login="mateusz", password="mateusz")
+            with app.app_context():
+                db.session.add(new_user)
+                db.session.commit()
 
-        new_user = Users(login="Laura", password="laura")
-        with app.app_context():
-            db.session.add(new_user)
-            db.session.commit()
+            new_user = Users(login="Laura", password="laura")
+            with app.app_context():
+                db.session.add(new_user)
+                db.session.commit()
 
-        new_user = Users(login="Patrycja", password="patrycja")
-        with app.app_context():
-            db.session.add(new_user)
-            db.session.commit()
+            new_user = Users(login="Patrycja", password="patrycja")
+            with app.app_context():
+                db.session.add(new_user)
+                db.session.commit()
 
 
 # getting data from JSONPlaceholder API
@@ -90,20 +91,26 @@ json_posts = json.loads(data)
 
 @app.route('/')  # Rendering all posts in database
 def home_window():
+    if Users.query.first() is None:
+        create_users_database()
     logged_user = request.cookies.get('username')
     posts = Post.query.all()
     users = Users.query.all()
-    #return render_template('home.html')
     if logged_user is None:
         return render_template('home.html', posts=posts, users=users)
     else:
         return render_template('home.html', posts=posts, users=users, logged_user=logged_user)
 
+# @app.route('/')  # Rendering all posts in database
+# def home_window():
+#     return render_template('home.html')
+
 
 @app.route("/add", methods=["POST"])  # Adding post to the database
 def add():
     logged_user = request.cookies.get('username')
-    new_post = Post(userId=request.form.get("user_id"), title=request.form.get("title"), body=request.form.get("body"))
+    print(logged_user)
+    new_post = Post(userId=Users.query.filter_by(login=logged_user).first().id, title=request.form.get("title"), body=request.form.get("body"))
     with app.app_context():
         db.session.add(new_post)
         db.session.commit()
@@ -122,7 +129,6 @@ def delete(id):
 
 @app.route("/new_post")  # url to the new post page
 def new_post():
-    logged_user = request.cookies.get('username')
     return render_template('new_post.html')
 
 
@@ -134,7 +140,10 @@ def search_post():
     with app.app_context():
         posts = Post.query.filter(Post.title.contains(request.form.get("searched_string"))).all()
         users = Users.query.all()
-    return render_template('home.html', posts=posts, users=users)
+    if logged_user is None:
+        return render_template('home.html', posts=posts, users=users)
+    else:
+        return render_template('home.html', posts=posts, users=users, logged_user=logged_user)
 
 
 @app.route("/filtered", methods=["POST"])  # Filtering posts by author
@@ -145,7 +154,10 @@ def filtered_post():
     with app.app_context():
         posts = Post.query.filter(Post.userId == (request.form.get("filtered_string"))).all()
         users = Users.query.all()
-    return render_template('home.html', posts=posts, users=users)
+    if logged_user is None:
+        return render_template('home.html', posts=posts, users=users)
+    else:
+        return render_template('home.html', posts=posts, users=users, logged_user=logged_user)
 
 
 @app.route('/about')  # url to the about page
@@ -176,7 +188,6 @@ def check_login_data():
 
 @app.route('/post_details/<int:id>')  # url to details of a post
 def post_details(id):
-    logged_user = request.cookies.get('username')
     with app.app_context():
         post = Post.query.filter_by(id=id).first()
         user = Users.query.filter_by(id=post.userId).first()
