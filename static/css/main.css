@@ -85,6 +85,9 @@ div.about {
      -moz-border-radius: 6px;
           border-radius: 6px;
 }
+h1{
+  text-align: left;
+}
 h2 {
   font-size: 1.8em;
   margin-top: 40px;
@@ -98,6 +101,9 @@ h3 {
   text-align: left;
   letter-spacing: -1px;
   color: #000;
+}
+p {
+    text-align: left;
 }
 .menu {
   float: right;

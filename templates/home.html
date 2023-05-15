@@ -29,23 +29,28 @@
           <ul class="menu">
               <form action="/search" method="post">
               <div>
-                <input type="text" size="50" name="searched_string" placeholder="Title"> <br>
+                <input type="text" size="50" name="searched_string" placeholder="Title">
                 <button type="submit">Search</button> <br>
               </div>
           </form>
+              </br>
               <form action="/filtered" method="post">
               <div>
-                <input type="text" size="50" name="filtered_string" placeholder="Author"> <br>
+                <input type="text" size="50" name="filtered_string" placeholder="Author">
                 <button type="submit">Search</button> <br>
               </div>
           </form>
               <h4><a href="/new_post" style="text-decoration: none"> Add post </a></h4> <br><br>
+
             {%  for post in posts %}
+            <div style="border-bottom: 5px solid green">
             <a href="/post_details/{{post.id}}" style="color: black; text-decoration: none"><h1>{{post.title}}</h1></a>
             <p>By {{users[post.userId-1].login}} on {{post.post_date}}</p>
                  <form action="/delete/{{post.id}}" method="post">
-                <a href="/delete/{{post.id}}" style="text-decoration: none">Delete post</a>
+                <a href="/delete/{{post.id}}" style="color: black; text-decoration: none">Delete post</a>
          </form>
+            </div>
+              </br>
             {% endfor %}
           </ul>
         </nav></strong>
