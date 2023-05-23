@@ -2,13 +2,18 @@ from locust import HttpUser, TaskSet, task
 
 
 class WebsiteTasks(TaskSet):
+
     @task(3)
-    def index(self):
+    def home_page(self):
         self.client.get("/")
 
-    @task(1)
+    @task(2)
     def about_page(self):
         self.client.get("/about")
+
+    @task(1)
+    def login_page(self):
+        self.client.get("/login_page")
 
 
 class WebsiteUser(HttpUser):

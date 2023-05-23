@@ -10,12 +10,15 @@
         <h1 class="logo">Home page</h1>
         <strong><nav>
           <ul class="menu">
+              <form action="/logout" method="post">
             <li><a href="/about">About</a></li>
               {% if logged_user is defined %}
-                <li><a>Welcome, {{logged_user}}</a> </li>
+                <li><a>Welcome, {{logged_user}}</a></li>
+              <li> <button type="submit">Log out</button></li>
               {% else %}
                 <li><a href="/login_page">Log In</a> </li>
               {% endif %}
+                  </form>
           </ul>
         </nav></strong>
       </div>
@@ -40,14 +43,17 @@
                 <button type="submit">Search</button> <br>
               </div>
           </form>
+              {% if logged_user is defined %}
               <h4><a href="/new_post" style="text-decoration: none"> Add post </a></h4> <br><br>
-
+                 {% endif %}
             {%  for post in posts %}
             <div style="border-bottom: 5px solid green">
             <a href="/post_details/{{post.id}}" style="color: black; text-decoration: none"><h1>{{post.title}}</h1></a>
             <p>By {{users[post.userId-1].login}} on {{post.post_date}}</p>
                  <form action="/delete/{{post.id}}" method="post">
+                     {% if logged_user == "Kamil" %}
                 <a href="/delete/{{post.id}}" style="color: black; text-decoration: none">Delete post</a>
+                     {% endif %}
          </form>
             </div>
               </br>

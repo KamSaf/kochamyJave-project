@@ -89,6 +89,7 @@ api_response = requests.get('https://jsonplaceholder.typicode.com/posts')
 data = api_response.text
 json_posts = json.loads(data)
 
+
 @app.route('/')  # Rendering all posts in database
 def home_window():
     if Users.query.first() is None:
@@ -96,7 +97,7 @@ def home_window():
     logged_user = request.cookies.get('username')
     posts = Post.query.all()
     users = Users.query.all()
-    if logged_user is None:
+    if logged_user is None or logged_user == 'none':
         return render_template('home.html', posts=posts, users=users)
     else:
         return render_template('home.html', posts=posts, users=users, logged_user=logged_user)
@@ -140,7 +141,7 @@ def search_post():
     with app.app_context():
         posts = Post.query.filter(Post.title.contains(request.form.get("searched_string"))).all()
         users = Users.query.all()
-    if logged_user is None:
+    if logged_user is None or logged_user == 'none':
         return render_template('home.html', posts=posts, users=users)
     else:
         return render_template('home.html', posts=posts, users=users, logged_user=logged_user)
@@ -154,7 +155,7 @@ def filtered_post():
     with app.app_context():
         posts = Post.query.filter(Post.userId == (request.form.get("filtered_string"))).all()
         users = Users.query.all()
-    if logged_user is None:
+    if logged_user is None or logged_user == 'none':
         return render_template('home.html', posts=posts, users=users)
     else:
         return render_template('home.html', posts=posts, users=users, logged_user=logged_user)
@@ -188,10 +189,21 @@ def check_login_data():
 
 @app.route('/post_details/<int:id>')  # url to details of a post
 def post_details(id):
+    logged_user = request.cookies.get('username')
     with app.app_context():
         post = Post.query.filter_by(id=id).first()
         user = Users.query.filter_by(id=post.userId).first()
-    return render_template('post_details.html', post=post, user=user)
+    if logged_user is None or logged_user == 'none':
+        return render_template('post_details.html', post=post, user=user)
+    else:
+        return render_template('post_details.html', post=post, user=user, logged_user=logged_user)
+
+@app.route('/logout', methods=["POST"])
+def log_out():
+    with app.app_context():
+        resp = make_response(redirect(url_for("home_window")))
+        resp.set_cookie('username', 'none')
+        return resp
 
 
 if __name__ == '__main__':
