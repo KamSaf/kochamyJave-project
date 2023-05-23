@@ -189,10 +189,14 @@ def check_login_data():
 
 @app.route('/post_details/<int:id>')  # url to details of a post
 def post_details(id):
+    logged_user = request.cookies.get('username')
     with app.app_context():
         post = Post.query.filter_by(id=id).first()
         user = Users.query.filter_by(id=post.userId).first()
-    return render_template('post_details.html', post=post, user=user)
+    if logged_user is None or logged_user == 'none':
+        return render_template('post_details.html', post=post, user=user)
+    else:
+        return render_template('post_details.html', post=post, user=user, logged_user=logged_user)
 
 @app.route('/logout', methods=["POST"])
 def log_out():
