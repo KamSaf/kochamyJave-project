@@ -10,12 +10,15 @@
         <h1 class="logo">Home page</h1>
         <strong><nav>
           <ul class="menu">
+              <form action="/logout" method="post">
             <li><a href="/about">About</a></li>
               {% if logged_user is defined %}
-                <li><a>Welcome, {{logged_user}}</a> </li>
+                <li><a>Welcome, {{logged_user}}</a></li>
+              <li> <button type="submit">Log out</button></li>
               {% else %}
                 <li><a href="/login_page">Log In</a> </li>
               {% endif %}
+                  </form>
           </ul>
         </nav></strong>
       </div>
