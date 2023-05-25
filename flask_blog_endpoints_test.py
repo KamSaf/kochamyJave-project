@@ -1,5 +1,5 @@
 import flask_testing
-from flask_blog import app, db
+from flask_blog import app, db, Post, Users
 
 
 class TestPages(flask_testing.TestCase):
@@ -11,8 +11,18 @@ class TestPages(flask_testing.TestCase):
 
     def setUp(self):
         db.create_all()
+        user = Users(login='testuser', password='password')
+        db.session.add(user)
+        post = Post(userId='1', title='test post', body='test post')
+        db.session.add(post)
+        db.session.commit()
 
     def tearDown(self):
+        user = Users.query.filter_by(login='testuser').first()
+        db.session.delete(user)
+        post = Post.query.filter_by(title='test post').first()
+        db.session.delete(post)
+        db.session.commit()
         db.session.remove()
 
     def test_get_home_page(self):
@@ -49,3 +59,8 @@ class TestPages(flask_testing.TestCase):
         with self.client:
             response = self.client.post('/search', data={'searched_string': 'est'}, follow_redirects=True)
             self.assert_template_used('home.html')
+
+    def test_get_post_details_page(self):
+        with self.client:
+            response = self.client.get('/post_details/1')
+            self.assert_template_used('post_details.html')
