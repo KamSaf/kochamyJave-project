@@ -37,6 +37,22 @@
                 <a href="/delete/{{post.id}}">Delete post</a>
                      {% endif %}
          </form>
+              <br><br><br>
+              <p>Comments:</p>
+              <br><br>
+                          {%  for comment in comments %}
+            <div style="border-bottom: 5px solid green">
+            <a style="color: black; text-decoration: none"><h1>{{comment.name}}</h1></a>
+                <p>By {{comment.body}}</p><br>
+            <p>By {{comment.email}}</p>
+                 <form action="/delete/{{post.id}}" method="post">
+                     {% if logged_user == "Kamil" %}
+                <a  style="color: black; text-decoration: none">Delete comment</a>
+                     {% endif %}
+         </form>
+            </div>
+              </br>
+            {% endfor %}
           </ul>
         </nav></strong>
       </div>

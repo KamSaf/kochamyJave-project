@@ -6,7 +6,7 @@ class TestLogin(flask_testing.TestCase):
 
     def create_app(self):
         app.config['TESTING'] = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         return app
 
@@ -17,8 +17,11 @@ class TestLogin(flask_testing.TestCase):
         db.session.commit()
 
     def tearDown(self):
+        user = Users.query.filter_by(login='testuser').first()
+        if user:
+            db.session.delete(user)
+        db.session.commit()
         db.session.remove()
-        db.drop_all()
 
     def test_valid_login(self):
         with self.client:

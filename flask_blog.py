@@ -8,8 +8,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_BINDS'] = {
     'test_database': 'sqlite:///test.db',
-    'production_database': 'sqlite:///db.sqlite'
 }
+
 db = SQLAlchemy(app)
 
 
@@ -27,73 +27,90 @@ class Users(db.Model):  # users database
     password = db.Column(db.String(200), unique=True)  # temporarily password is stored without using a hashing function
 
 
-# with app.app_context():
-#     print(Users.query.first().login)
-def create_users_database():
+class Comments(db.Model):
+    postId = db.Column(db.Integer)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    email = db.Column(db.String(100))
+    body = db.Column(db.String(500))
+
+
+def create_users_database(testing=''):
+    with app.app_context():
+        adding_result = []
+        db.create_all()
+        new_user = Users(login="Kamil", password="kamil")
+        db.session.add(new_user)
+
+        new_user = Users(login="Slawek", password="slawek")
+        db.session.add(new_user)
+
+        new_user = Users(login="Marcin", password="marcin")
+        db.session.add(new_user)
+
+        new_user = Users(login="Ola", password="ola")
+        db.session.add(new_user)
+
+        new_user = Users(login="Marek", password="marek")
+        db.session.add(new_user)
+
+        new_user = Users(login="Patryk", password="patryk")
+        db.session.add(new_user)
+
+        new_user = Users(login="Pawel", password="pawel")
+        db.session.add(new_user)
+
+        new_user = Users(login="Mateusz", password="mateusz")
+        db.session.add(new_user)
+
+        new_user = Users(login="Laura", password="laura")
+        db.session.add(new_user)
+
+        new_user = Users(login="Patrycja", password="patrycja")
+        db.session.add(new_user)
+        if testing == 'testing':
+            db.session.rollback()
+        else:
+            db.session.commit()
+    return True
+
+def create_posts_database():
     with app.app_context():
         db.create_all()
-        if Users.query.first() is None:
-            new_user = Users(login="Kamil", password="kamil")
+        api_response = requests.get('https://jsonplaceholder.typicode.com/posts')
+        data = api_response.text
+        json_posts = json.loads(data)
+        for post in json_posts:
+            new_post = Post(userId=post['userId'], title=post['title'], body=post['body'])
             with app.app_context():
-                db.session.add(new_user)
+                db.session.add(new_post)
                 db.session.commit()
+        db.session.remove()
+        return True
 
-            new_user = Users(login="Slawek", password="slawek")
+
+def create_comments_database():
+    with app.app_context():
+        db.create_all()
+        api_response = requests.get('https://jsonplaceholder.typicode.com/comments')
+        data = api_response.text
+        json_comments = json.loads(data)
+        for comment in json_comments:
+            new_comment = Comments(postId = comment['postId'], name=comment['name'], email=comment['email'], body=comment['body'])
             with app.app_context():
-                db.session.add(new_user)
+                db.session.add(new_comment)
                 db.session.commit()
-
-            new_user = Users(login="Marcin", password="marcin")
-            with app.app_context():
-                db.session.add(new_user)
-                db.session.commit()
-
-            new_user = Users(login="Ola", password="ola")
-            with app.app_context():
-                db.session.add(new_user)
-                db.session.commit()
-
-            new_user = Users(login="Marek", password="marek")
-            with app.app_context():
-                db.session.add(new_user)
-                db.session.commit()
-
-            new_user = Users(login="Patryk", password="patryk")
-            with app.app_context():
-                db.session.add(new_user)
-                db.session.commit()
-
-            new_user = Users(login="Pawel", password="pawel")
-            with app.app_context():
-                db.session.add(new_user)
-                db.session.commit()
-
-            new_user = Users(login="mateusz", password="mateusz")
-            with app.app_context():
-                db.session.add(new_user)
-                db.session.commit()
-
-            new_user = Users(login="Laura", password="laura")
-            with app.app_context():
-                db.session.add(new_user)
-                db.session.commit()
-
-            new_user = Users(login="Patrycja", password="patrycja")
-            with app.app_context():
-                db.session.add(new_user)
-                db.session.commit()
+    db.session.remove()
+    return True
 
 
-# getting data from JSONPlaceholder API
-api_response = requests.get('https://jsonplaceholder.typicode.com/posts')
-data = api_response.text
-json_posts = json.loads(data)
 
-
+with app.app_context():
+    users = Users.query.all()
+    for user in users:
+        print(user.login)
 @app.route('/')  # Rendering all posts in database
 def home_window():
-    if Users.query.first() is None:
-        create_users_database()
     logged_user = request.cookies.get('username')
     posts = Post.query.all()
     users = Users.query.all()
@@ -102,9 +119,6 @@ def home_window():
     else:
         return render_template('home.html', posts=posts, users=users, logged_user=logged_user)
 
-# @app.route('/')  # Rendering all posts in database
-# def home_window():
-#     return render_template('home.html')
 
 
 @app.route("/add", methods=["POST"])  # Adding post to the database
@@ -193,10 +207,11 @@ def post_details(id):
     with app.app_context():
         post = Post.query.filter_by(id=id).first()
         user = Users.query.filter_by(id=post.userId).first()
+        comments = Comments.query.filter_by(postId=id).all()
     if logged_user is None or logged_user == 'none':
-        return render_template('post_details.html', post=post, user=user)
+        return render_template('post_details.html', post=post, user=user, comments=comments)
     else:
-        return render_template('post_details.html', post=post, user=user, logged_user=logged_user)
+        return render_template('post_details.html', post=post, user=user, logged_user=logged_user, comments=comments)
 
 @app.route('/logout', methods=["POST"])
 def log_out():
@@ -210,10 +225,9 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
         if Post.query.first() is None:
-            for post in json_posts:
-                new_post = Post(userId=post['userId'], title=post['title'], body=post['body'])
-                with app.app_context():
-                    db.session.add(new_post)
-                    db.session.commit()
-                    posts_added = True
-    app.run()  # when debug=True for some reason the for loop above adds posts twice
+            create_posts_database()
+        if Users.query.first() is None:
+            create_users_database()
+        if Comments.query.first() is None:
+            create_comments_database()
+    app.run()
