@@ -231,6 +231,3 @@ if __name__ == '__main__':
         if Comments.query.first() is None:
             create_comments_database()
     app.run()
-
-
-
