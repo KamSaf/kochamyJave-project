@@ -22,18 +22,12 @@ class CreatePostsDatabaseTestCase(unittest.TestCase):
     @patch('flask_blog.requests.get')
     def test_create_posts_database(self, mock_get):
         with app.app_context():
-            # Prepare mock response
             mock_response = MagicMock()
             mock_response.text = '[{"userId": 1, "title": "Test Title", "body": "Test Body"}]'
             mock_get.return_value = mock_response
-
-            # Call the method being tested
             result = create_posts_database()
 
-            # Assert that the method returns True
             self.assertTrue(result)
-
-            # Assert that the Post was added to the database correctly
             post = Post.query.filter_by(title="Test Title").first()
             self.assertIsNotNone(post)
             self.assertEqual(post.userId, 1)
