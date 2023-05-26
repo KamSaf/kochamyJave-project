@@ -6,10 +6,9 @@ import requests
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# app.config['SQLALCHEMY_BINDS'] = {
-#     'test_database': 'sqlite:///test.db',
-#     'production_database': 'sqlite:///db.sqlite'
-# }
+app.config['SQLALCHEMY_BINDS'] = {
+    'test_database': 'sqlite:///test.db',
+}
 
 db = SQLAlchemy(app)
 
@@ -36,62 +35,44 @@ class Comments(db.Model):
     body = db.Column(db.String(500))
 
 
-def create_users_database():
+def create_users_database(testing=''):
     with app.app_context():
+        adding_result = []
         db.create_all()
-        if Users.query.first() is None:
-            new_user = Users(login="Kamil", password="kamil")
-            with app.app_context():
-                db.session.add(new_user)
-                db.session.commit()
+        new_user = Users(login="Kamil", password="kamil")
+        db.session.add(new_user)
 
-            new_user = Users(login="Slawek", password="slawek")
-            with app.app_context():
-                db.session.add(new_user)
-                db.session.commit()
+        new_user = Users(login="Slawek", password="slawek")
+        db.session.add(new_user)
 
-            new_user = Users(login="Marcin", password="marcin")
-            with app.app_context():
-                db.session.add(new_user)
-                db.session.commit()
+        new_user = Users(login="Marcin", password="marcin")
+        db.session.add(new_user)
 
-            new_user = Users(login="Ola", password="ola")
-            with app.app_context():
-                db.session.add(new_user)
-                db.session.commit()
+        new_user = Users(login="Ola", password="ola")
+        db.session.add(new_user)
 
-            new_user = Users(login="Marek", password="marek")
-            with app.app_context():
-                db.session.add(new_user)
-                db.session.commit()
+        new_user = Users(login="Marek", password="marek")
+        db.session.add(new_user)
 
-            new_user = Users(login="Patryk", password="patryk")
-            with app.app_context():
-                db.session.add(new_user)
-                db.session.commit()
+        new_user = Users(login="Patryk", password="patryk")
+        db.session.add(new_user)
 
-            new_user = Users(login="Pawel", password="pawel")
-            with app.app_context():
-                db.session.add(new_user)
-                db.session.commit()
+        new_user = Users(login="Pawel", password="pawel")
+        db.session.add(new_user)
 
-            new_user = Users(login="Mateusz", password="mateusz")
-            with app.app_context():
-                db.session.add(new_user)
-                db.session.commit()
+        new_user = Users(login="Mateusz", password="mateusz")
+        db.session.add(new_user)
 
-            new_user = Users(login="Laura", password="laura")
-            with app.app_context():
-                db.session.add(new_user)
-                db.session.commit()
+        new_user = Users(login="Laura", password="laura")
+        db.session.add(new_user)
 
-            new_user = Users(login="Patrycja", password="patrycja")
-            with app.app_context():
-                db.session.add(new_user)
-                db.session.commit()
-    db.session.remove()
+        new_user = Users(login="Patrycja", password="patrycja")
+        db.session.add(new_user)
+        if testing == 'testing':
+            db.session.rollback()
+        else:
+            db.session.commit()
     return True
-
 
 def create_posts_database():
     with app.app_context():
@@ -115,7 +96,7 @@ def create_comments_database():
         data = api_response.text
         json_comments = json.loads(data)
         for comment in json_comments:
-            new_comment = Comments(postId = comment['postId'], id=comment['id'], name=comment['name'], email=comment['email'], body=comment['body'])
+            new_comment = Comments(postId = comment['postId'], name=comment['name'], email=comment['email'], body=comment['body'])
             with app.app_context():
                 db.session.add(new_comment)
                 db.session.commit()
@@ -226,10 +207,11 @@ def post_details(id):
     with app.app_context():
         post = Post.query.filter_by(id=id).first()
         user = Users.query.filter_by(id=post.userId).first()
+        comments = Comments.query.filter_by(postId=id).all()
     if logged_user is None or logged_user == 'none':
-        return render_template('post_details.html', post=post, user=user)
+        return render_template('post_details.html', post=post, user=user, comments=comments)
     else:
-        return render_template('post_details.html', post=post, user=user, logged_user=logged_user)
+        return render_template('post_details.html', post=post, user=user, logged_user=logged_user, comments=comments)
 
 @app.route('/logout', methods=["POST"])
 def log_out():
@@ -248,4 +230,7 @@ if __name__ == '__main__':
             create_users_database()
         if Comments.query.first() is None:
             create_comments_database()
-    app.run()  # when debug=True for some reason the for loop above adds posts twice
+    app.run()
+
+
+

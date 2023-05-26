@@ -38,6 +38,17 @@ class TestAddRoute(TestCase):
             self.assertEqual(post.title, 'Test Post')
             self.assertEqual(post.body, 'test post')
 
+    def test_delete_route(self):
+        with self.client:
+            post = Post(userId='1', title='test post', body='test post')
+            db.session.add(post)
+            db.session.commit()
+
+            post_id = Post.query.filter_by(title='test post').first().id
+            response = self.client.get(f'/delete/{post_id}')
+            post = Post.query.filter_by(id=post_id).first()
+            self.assertIsNone(post)
+
 
 if __name__ == '__main__':
     unittest.main()
