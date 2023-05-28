@@ -3,7 +3,7 @@ from flask_testing import TestCase
 from flask_blog import app, db, Users, Post
 
 
-class TestAddRoute(TestCase):
+class TestAddDeleteRoutes(TestCase):
 
     def create_app(self):
         app.config['TESTING'] = True

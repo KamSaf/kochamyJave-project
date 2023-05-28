@@ -6,9 +6,6 @@ import requests
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_BINDS'] = {
-    'test_database': 'sqlite:///test.db',
-}
 
 db = SQLAlchemy(app)
 
@@ -104,15 +101,14 @@ def create_comments_database():
     return True
 
 
-
-with app.app_context():
-    users = Users.query.all()
-    for user in users:
-        print(user.login)
+# with app.app_context():
+#     users = Users.query.all()
+#     for user in users:
+#         print(user.login)
 @app.route('/')  # Rendering all posts in database
 def home_window():
     logged_user = request.cookies.get('username')
-    posts = Post.query.all()
+    posts = Post.query.order_by(Post.id.desc()).all()
     users = Users.query.all()
     if logged_user is None or logged_user == 'none':
         return render_template('home.html', posts=posts, users=users)
@@ -120,11 +116,9 @@ def home_window():
         return render_template('home.html', posts=posts, users=users, logged_user=logged_user)
 
 
-
 @app.route("/add", methods=["POST"])  # Adding post to the database
 def add():
     logged_user = request.cookies.get('username')
-    print(logged_user)
     new_post = Post(userId=Users.query.filter_by(login=logged_user).first().id, title=request.form.get("title"), body=request.form.get("body"))
     with app.app_context():
         db.session.add(new_post)
@@ -153,7 +147,7 @@ def search_post():
     if request.form.get("searched_string") == '':
         return redirect(url_for("home_window"))
     with app.app_context():
-        posts = Post.query.filter(Post.title.contains(request.form.get("searched_string"))).all()
+        posts = Post.query.filter(Post.title.contains(request.form.get("searched_string"))).order_by(Post.id.desc()).all()
         users = Users.query.all()
     if logged_user is None or logged_user == 'none':
         return render_template('home.html', posts=posts, users=users)
@@ -161,14 +155,36 @@ def search_post():
         return render_template('home.html', posts=posts, users=users, logged_user=logged_user)
 
 
-@app.route("/filtered", methods=["POST"])  # Filtering posts by author
+# @app.route("/filtered", methods=["POST"])  # Filtering posts by author
+# def filtered_post():
+#     logged_user = request.cookies.get('username')
+#     if request.form.get("filtered_string") == '':
+#         return redirect(url_for("home_window"))
+#     with app.app_context():
+#         posts = Post.query.filter(Post.userId == (request.form.get("filtered_string"))).order_by(Post.id.desc()).all()
+#         users = Users.query.all()
+#     if logged_user is None or logged_user == 'none':
+#         return render_template('home.html', posts=posts, users=users)
+#     else:
+#         return render_template('home.html', posts=posts, users=users, logged_user=logged_user)
+
+@app.route("/filtered", methods=["POST"])  # Filter posts by number of characters in title
 def filtered_post():
     logged_user = request.cookies.get('username')
-    if request.form.get("filtered_string") == '':
-        return redirect(url_for("home_window"))
-    with app.app_context():
-        posts = Post.query.filter(Post.userId == (request.form.get("filtered_string"))).all()
-        users = Users.query.all()
+    param1 = 0
+    param2 = 0
+    posts = Post.query.order_by(Post.id.desc()).all()
+    users = Users.query.all()
+    if request.form.get("upper_bound") != '' or request.form.get("lower_bound") != '':
+        if request.form.get("upper_bound").isdigit():
+            param1 = int(request.form.get("upper_bound"))
+        if request.form.get("lower_bound").isdigit():
+            param2 = int(request.form.get("lower_bound"))
+        filtered_posts = []
+        for post in posts:
+            if param2 <= len(post.title) <= param1:
+                filtered_posts.append(post)
+        posts = filtered_posts
     if logged_user is None or logged_user == 'none':
         return render_template('home.html', posts=posts, users=users)
     else:
@@ -213,12 +229,39 @@ def post_details(id):
     else:
         return render_template('post_details.html', post=post, user=user, logged_user=logged_user, comments=comments)
 
+
 @app.route('/logout', methods=["POST"])
 def log_out():
     with app.app_context():
         resp = make_response(redirect(url_for("home_window")))
         resp.set_cookie('username', 'none')
         return resp
+
+
+@app.route("/new_comment/<int:post_id>")  # url to the new post page
+def new_comment(post_id):
+    return render_template('new_comment.html', post_id=post_id)
+
+
+@app.route('/add_comment/<int:post_id>', methods=['POST'])
+def add_comment(post_id):
+    with app.app_context():
+        new_comment = Comments(email=request.form.get("email"), name=request.form.get("name"),
+                        body=request.form.get("body"), postId=post_id)
+        with app.app_context():
+            db.session.add(new_comment)
+            db.session.commit()
+        return redirect(f'/post_details/{post_id}')
+
+
+@app.route('/delete_comment/<int:comment_id>')
+def delete_comment(comment_id):
+    with app.app_context():
+        post_id = Comments.query.filter_by(id=comment_id).first().postId
+        comment = Comments.query.filter_by(id=comment_id).first()
+        db.session.delete(comment)
+        db.session.commit()
+    return redirect(f'/post_details/{post_id}')
 
 
 if __name__ == '__main__':
