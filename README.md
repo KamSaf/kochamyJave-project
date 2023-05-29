@@ -16,6 +16,6 @@ to add and comment posts. For educational purposes the application uses free RES
   - SQLAlchemy
   - blinker
   - Locust
-  - Playwright
+  - pytest-playwright
 
 5. Run the flaskBlog.py file with Python.
