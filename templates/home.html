@@ -49,6 +49,7 @@
               {% if logged_user is defined %}
               <h4><a href="/new_post" style="text-decoration: none"> Add post </a></h4> <br><br>
                  {% endif %}
+              <br><br><br><br>
             {%  for post in posts %}
             <div style="border-bottom: 5px solid green">
             <a href="/post_details/{{post.id}}" style="color: black; text-decoration: none"><h1>{{post.title}}</h1></a>
