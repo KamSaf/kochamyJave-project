@@ -7,7 +7,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
+db = SQLAlchemy(app) # creating SQLAlchemy instance
 
 
 # creating SQLAlchemy database models
@@ -24,7 +24,7 @@ class Users(db.Model):  # users database
     password = db.Column(db.String(200), unique=True)  # temporarily password is stored without using a hashing function
 
 
-class Comments(db.Model):
+class Comments(db.Model):  # comments database
     postId = db.Column(db.Integer)
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
@@ -32,9 +32,8 @@ class Comments(db.Model):
     body = db.Column(db.String(500))
 
 
-def create_users_database(testing=''):
+def create_users_database(testing=''):  # users database
     with app.app_context():
-        adding_result = []
         db.create_all()
         new_user = Users(login="Kamil", password="kamil")
         db.session.add(new_user)
@@ -70,6 +69,7 @@ def create_users_database(testing=''):
         else:
             db.session.commit()
     return True
+
 
 def create_posts_database():
     with app.app_context():
