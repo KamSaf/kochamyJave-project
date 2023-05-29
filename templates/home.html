@@ -12,6 +12,7 @@
           <ul class="menu">
               <form action="/logout" method="post">
             <li><a href="/about">About</a></li>
+                  <li><a href="/albums">Albums</a></li>
               {% if logged_user is defined %}
                 <li><a>Welcome, {{logged_user}}</a></li>
               <li> <button type="submit">Log out</button></li>
