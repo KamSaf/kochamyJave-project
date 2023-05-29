@@ -19,3 +19,10 @@ to add and comment posts. For educational purposes the application uses free RES
   - pytest-playwright
 
 5. Run the flaskBlog.py file with Python.
+
+
+
+
+Unit tests report:
+
+![unit_tests_report](https://github.com/KamSaf/kochamyJave-project/assets/116653905/06092876-58d8-4945-94b4-fd3238f0647f)
