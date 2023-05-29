@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Add new post</title>
+    <title>Add new comment</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
@@ -15,11 +15,12 @@
           </div>
     </header>
       <div align="center" style="margin-top: 50px;">
-        <b>New post</b><br>
-          <form action="/add" method="post">
+        <b> New comment</b><br>
+          <form action="/add_comment//{{post_id}}" method="post">
               <div>
-                <input type="text" size="50" name="title" placeholder="Title"> <br>
-                <textarea rows="15" cols="100" name="body"  placeholder="Post content"></textarea> <br>
+                <input type="text" size="50" name="name" placeholder="Title"> <br>
+                <textarea rows="15" cols="100" name="body"  placeholder="Comment content"></textarea> <br>
+                  <input type="text" size="50" name="email" placeholder="Email address"> <br>
                 <button type="submit">Share</button> <br>
               </div>
           </form>

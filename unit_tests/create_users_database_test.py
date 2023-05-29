@@ -16,4 +16,4 @@ class TestDatabase(flask_testing.TestCase):
         db.session.remove()
 
     def test_create_users_database(self):
-        assert create_users_database('testing') == True
+        assert create_users_database('testing') is True

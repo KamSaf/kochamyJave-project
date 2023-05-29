@@ -47,12 +47,12 @@ class TestPages(flask_testing.TestCase):
 
     def test_get_filtered_page(self):
         with self.client:
-            response = self.client.post('/filtered', data={'filtered_string': 'est'}, follow_redirects=True)
+            response = self.client.post('/filtered', data={'lower_bound': '3', 'upper_bound': '13'}, follow_redirects=True)
             self.assert_template_used('home.html')
 
     def test_get_filtered_empty_page(self):
         with self.client:
-            response = self.client.post('/filtered', data={'filtered_string': ''}, follow_redirects=True)
+            response = self.client.post('/filtered', data={'lower_bound': '', 'upper_bound': ''}, follow_redirects=True)
             self.assert_template_used('home.html')
 
     def test_get_searched_page(self):
@@ -64,3 +64,8 @@ class TestPages(flask_testing.TestCase):
         with self.client:
             response = self.client.get('/post_details/1')
             self.assert_template_used('post_details.html')
+
+    def test_get_logut_endpoint(self):
+        with self.client:
+            response = self.client.post('/logout', follow_redirects=True)
+            self.assert_template_used('home.html')
