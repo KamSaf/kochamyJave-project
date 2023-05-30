@@ -32,6 +32,12 @@ class Comments(db.Model):  # comments database
     body = db.Column(db.String(500))
 
 
+class Albums(db.Model):  # albums database
+    userId = db.Column(db.Integer)
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(500))
+
+
 def create_users_database(testing=''):  # users database
     with app.app_context():
         db.create_all()
@@ -71,32 +77,40 @@ def create_users_database(testing=''):  # users database
     return True
 
 
+def create_albums_database():
+    api_response = requests.get('https://jsonplaceholder.typicode.com/albums')
+    data = api_response.text
+    json_albums = json.loads(data)
+    db.create_all()
+    for album in json_albums:
+        new_album = Albums(userId = album['userId'], title= album['title'])
+        db.session.add(new_album)
+    db.session.commit()
+    return True
+
+
 def create_posts_database():
-    with app.app_context():
-        db.create_all()
-        api_response = requests.get('https://jsonplaceholder.typicode.com/posts')
-        data = api_response.text
-        json_posts = json.loads(data)
-        for post in json_posts:
-            new_post = Post(userId=post['userId'], title=post['title'], body=post['body'])
-            with app.app_context():
-                db.session.add(new_post)
-                db.session.commit()
-        db.session.remove()
-        return True
+    db.create_all()
+    api_response = requests.get('https://jsonplaceholder.typicode.com/posts')
+    data = api_response.text
+    json_posts = json.loads(data)
+    for post in json_posts:
+        new_post = Post(userId=post['userId'], title=post['title'], body=post['body'])
+        db.session.add(new_post)
+        db.session.commit()
+    db.session.remove()
+    return True
 
 
 def create_comments_database():
-    with app.app_context():
-        db.create_all()
-        api_response = requests.get('https://jsonplaceholder.typicode.com/comments')
-        data = api_response.text
-        json_comments = json.loads(data)
-        for comment in json_comments:
-            new_comment = Comments(postId = comment['postId'], name=comment['name'], email=comment['email'], body=comment['body'])
-            with app.app_context():
-                db.session.add(new_comment)
-                db.session.commit()
+    db.create_all()
+    api_response = requests.get('https://jsonplaceholder.typicode.com/comments')
+    data = api_response.text
+    json_comments = json.loads(data)
+    for comment in json_comments:
+        new_comment = Comments(postId = comment['postId'], name=comment['name'], email=comment['email'], body=comment['body'])
+        db.session.add(new_comment)
+        db.session.commit()
     db.session.remove()
     return True
 
@@ -243,7 +257,7 @@ def new_comment(post_id):
     return render_template('new_comment.html', post_id=post_id)
 
 
-@app.route('/add_comment/<int:post_id>', methods=['POST'])
+@app.route('/add_comment/<int:post_id>', methods=['POST'])  # Adding comment
 def add_comment(post_id):
     with app.app_context():
         new_comment = Comments(email=request.form.get("email"), name=request.form.get("name"),
@@ -254,7 +268,7 @@ def add_comment(post_id):
         return redirect(f'/post_details/{post_id}')
 
 
-@app.route('/delete_comment/<int:comment_id>')
+@app.route('/delete_comment/<int:comment_id>')  # Deleting comment
 def delete_comment(comment_id):
     with app.app_context():
         post_id = Comments.query.filter_by(id=comment_id).first().postId
@@ -262,6 +276,31 @@ def delete_comment(comment_id):
         db.session.delete(comment)
         db.session.commit()
     return redirect(f'/post_details/{post_id}')
+
+
+@app.route('/albums')  # Rendering albums
+def albums():
+    logged_user = request.cookies.get('username')
+    albums = Albums.query.all()
+    users = Users.query.all()
+    if logged_user is None or logged_user == 'none':
+        return render_template('albums.html', albums=albums, users=users)
+    else:
+        return render_template('albums.html', albums=albums, users=users, logged_user=logged_user)
+
+
+@app.route('/album_details/<int:id>')  # url to details of an album
+def album_details(id):
+    logged_user = request.cookies.get('username')
+    api_response = requests.get(f'https://jsonplaceholder.typicode.com/albums/{id}/photos')
+    data = api_response.text
+    json_photos = json.loads(data)
+    album = Albums.query.filter_by(id=id).first()
+    user = Users.query.filter_by(id=album.userId).first()
+    if logged_user is None or logged_user == 'none':
+        return render_template('album_details.html', album=album, user=user, photos=json_photos)
+    else:
+        return render_template('album_details.html', album=album, user=user, logged_user=logged_user, photos=json_photos)
 
 
 if __name__ == '__main__':
@@ -273,4 +312,6 @@ if __name__ == '__main__':
             create_users_database()
         if Comments.query.first() is None:
             create_comments_database()
+        if Albums.query.first() is None:
+            create_albums_database()
     app.run()

@@ -1,5 +1,5 @@
 import flask_testing
-from flask_blog import app, db, Post, Users
+from flask_blog import app, db, Post, Users, Comments
 
 
 class TestPages(flask_testing.TestCase):
@@ -15,6 +15,8 @@ class TestPages(flask_testing.TestCase):
         db.session.add(user)
         post = Post(userId='1', title='test post', body='test post')
         db.session.add(post)
+        comment = Comments(postId=1, name='test comment', email='test@email.com', body='test comment content')
+        db.session.add(comment)
         db.session.commit()
 
     def tearDown(self):
@@ -22,6 +24,8 @@ class TestPages(flask_testing.TestCase):
         db.session.delete(user)
         post = Post.query.filter_by(title='test post').first()
         db.session.delete(post)
+        comment = Comments.query.filter_by(name='test comment').first()
+        db.session.delete(comment)
         db.session.commit()
         db.session.remove()
 
@@ -55,17 +59,45 @@ class TestPages(flask_testing.TestCase):
             response = self.client.post('/filtered', data={'lower_bound': '', 'upper_bound': ''}, follow_redirects=True)
             self.assert_template_used('home.html')
 
+    def test_filtered_loggedin(self):
+        with self.client:
+            self.client.set_cookie('/', 'username', 'testuser')
+            response = self.client.post('/filtered', data={'lower_bound': '3', 'upper_bound': '13'}, follow_redirects=True)
+            self.assert_template_used('home.html')
+
     def test_get_searched_page(self):
         with self.client:
             response = self.client.post('/search', data={'searched_string': 'est'}, follow_redirects=True)
             self.assert_template_used('home.html')
 
+    def test_search_empty_string(self):
+        with self.client:
+            response = self.client.post('/search', data={'searched_string': ''}, follow_redirects=True)
+            self.assert_template_used('home.html')
+
+    def test_searched_loggedin(self):
+        with self.client:
+            self.client.set_cookie('/', 'username', 'testuser')
+            response = self.client.post('/search', data={'searched_string': 'est'}, follow_redirects=True)
+            self.assert_template_used('home.html')
+
     def test_get_post_details_page(self):
         with self.client:
-            response = self.client.get('/post_details/1')
+            response = self.client.get('/post_details/' + str(Post.query.filter_by(title='test post').first().id))
+            self.assert_template_used('post_details.html')
+
+    def test_get_post_details_page_loggedin(self):
+        with self.client:
+            self.client.set_cookie('/', 'username', 'testuser')
+            response = self.client.get('/post_details/' + str(Post.query.filter_by(title='test post').first().id))
             self.assert_template_used('post_details.html')
 
     def test_get_logut_endpoint(self):
         with self.client:
             response = self.client.post('/logout', follow_redirects=True)
             self.assert_template_used('home.html')
+
+    def test_new_comment(self):
+        with self.client:
+            response = self.client.get('/new_comment/' + str(Post.query.filter_by(title='test post').first().id))
+            self.assert_template_used('new_comment.html')

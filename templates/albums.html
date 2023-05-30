@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Albums</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1 class="logo">Albums</h1>
+        <strong><nav>
+          <ul class="menu">
+              <form action="/logout" method="post">
+            <li><a href="/about">About</a></li>
+                  <li><a href="/">Home</a></li>
+              {% if logged_user is defined %}
+                <li><a>Welcome, {{logged_user}}</a></li>
+              <li> <button type="submit">Log out</button></li>
+              {% else %}
+                <li><a href="/login_page">Log In</a> </li>
+              {% endif %}
+                  </form>
+          </ul>
+        </nav></strong>
+      </div>
+    </header>
+    <div class="container">
+      {% block content %}
+      {% endblock %}
+    </div>
+  <div class="container1">
+        <strong><nav>
+          <ul class="menu">
+              </br>
+              <br><br><br><br>
+            {%  for album in albums %}
+            <div style="border-bottom: 5px solid green">
+                <form action="/album_details/{{album.id}}" method="post"></form>
+            <a href="/album_details/{{album.id}}" style="color: black; text-decoration: none"><h1>{{album.title}}</h1></a>
+            <p>By {{users[album.userId-1].login}}</p>
+                 <form action="/delete_album/{{album.id}}" method="post">
+                     {% if logged_user == "Kamil" %}
+                <a href="/delete_album/{{album.id}}" style="color: black; text-decoration: none">Delete album</a>
+                     {% endif %}
+         </form>
+            </div>
+              </br>
+            {% endfor %}
+          </ul>
+        </nav></strong>
+      </div>
+  </body>
+</html>
